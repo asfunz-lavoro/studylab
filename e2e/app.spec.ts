@@ -59,7 +59,7 @@ test("a new student can set up, upload a book, ask the tutor and study", async (
   const consoleErrors: string[] = [];
   page.on("console", (m) => m.type() === "error" && consoleErrors.push(m.text()));
   await mockGemini(page, calls);
-  await page.goto("/");
+  await page.goto("./");
 
   // 1. Welcome + language
   await expect(page.getByRole("heading", { name: /Benvenuta in StudyLab/ })).toBeVisible();
@@ -170,7 +170,7 @@ test("a new student can set up, upload a book, ask the tutor and study", async (
 
 test("paper search works against the real Semantic Scholar API @network", async ({ page }) => {
   test.skip(!process.env.NETWORK, "set NETWORK=1 to run");
-  await page.goto("/");
+  await page.goto("./");
   await page.evaluate(async () => {
     const req = indexedDB.open("studylab");
     await new Promise((r) => (req.onsuccess = r));
@@ -193,7 +193,7 @@ test("paper search works against the real Semantic Scholar API @network", async 
 
 test("mobile layout uses bottom navigation", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.getByRole("heading", { name: /Benvenuta/ })).toBeVisible();
   await shot(page, "11-mobile-welcome");
   const hasHorizontalScroll = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
