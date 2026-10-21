@@ -10,6 +10,8 @@ import JSZip from "jszip";
 import { exportObsidianZip } from "./backup";
 import { translator } from "./i18n";
 import { pagesForPrompt } from "./prompts";
+import { buildGraph, extractLinks, extractTags, openLinkQuery, renameLinks, resolveLink } from "./notes/links";
+import { renderMarkdown } from "./ui/Markdown";
 import { abstractFromInvertedIndex, fromOpenAlex, openAlexYearFilter, searchPapers } from "./s2";
 import { chunkPage, cleanText, textToPages } from "./rag/chunk";
 import { saveDocument } from "./rag/ingest";
@@ -241,6 +243,53 @@ describe("review fixes", () => {
     const zip = await JSZip.loadAsync(await exportObsidianZip());
     const names = Object.keys(zip.files).filter((n) => !zip.files[n].dir).sort();
     expect(names).toEqual(["Bio/Flashcards (2).md", "Bio/Flashcards.md", "Bio/Untitled (2).md", "Bio/Untitled.md"]);
+  });
+});
+
+describe("linked notes", () => {
+  const note = (id: number, title: string, content: string, subjectId = 1) => ({ id, title, content, subjectId, createdAt: 0, updatedAt: 0 });
+
+  it("extracts links and tags, ignoring code", () => {
+    const text = "Vedi [[Fotosintesi]], [[Cellula|la cellula]] e [[Mitosi#Fasi]].\n`[[non link]]` #esame #da-ripassare #123 C#\n```\n#codice [[codice]]\n```";
+    expect(extractLinks(text)).toEqual(["Fotosintesi", "Cellula", "Mitosi"]);
+    expect(extractTags(text)).toEqual(["esame", "da-ripassare"]);
+  });
+
+  it("resolves case-insensitively, preferring the same subject, and builds backlinks", () => {
+    const notes = [note(1, "Fotosintesi", "usa [[clorofilla]] e [[Cellula]]"), note(2, "Cellula", "parte di [[fotosintesi]]"), note(3, "Cellula", "altra", 2)];
+    expect(resolveLink("cellula", notes, 1)?.id).toBe(2);
+    expect(resolveLink("cellula", notes, 2)?.id).toBe(3);
+    const g = buildGraph(notes);
+    expect(g.edges).toEqual([
+      { source: 1, target: 2 },
+      { source: 2, target: 1 },
+    ]);
+    expect(g.backlinks.get(1)).toEqual([2]);
+    expect(g.unresolved.get(1)).toEqual(["clorofilla"]);
+    expect(g.nodes.find((n) => n.id === 3)?.degree).toBe(0);
+  });
+
+  it("renames links including aliases and headings", () => {
+    expect(renameLinks("[[fotosintesi]] e [[Fotosintesi|qui]] e [[Fotosintesi#Fase]] ma non [[Fotosintesi clorofilliana]]", "Fotosintesi", "Fotosintesi clorofilliana")).toBe(
+      "[[Fotosintesi clorofilliana]] e [[Fotosintesi clorofilliana|qui]] e [[Fotosintesi clorofilliana#Fase]] ma non [[Fotosintesi clorofilliana]]",
+    );
+    expect(renameLinks("[[Fotosintesi clorofilliana]]", "Fotosintesi", "X")).toBe("[[Fotosintesi clorofilliana]]");
+  });
+
+  it("detects an open [[ while typing", () => {
+    expect(openLinkQuery("vedi [[Foto")).toBe("Foto");
+    expect(openLinkQuery("vedi [[Foto]] e")).toBeNull();
+  });
+
+  it("renders wikilinks and tags only in notes mode, marking unresolved links", () => {
+    const html = renderMarkdown("Vedi [[Cellula]] e [[Nuovo|nuovo]] #esame", 0, { notes: true, knownTitles: new Set(["cellula"]) });
+    expect(html).toContain('class="wikilink" role="link" tabindex="0" data-note="Cellula">Cellula</a>');
+    expect(html).toContain('class="wikilink unresolved" role="link" tabindex="0" data-note="Nuovo">nuovo</a>');
+    expect(html).toContain('data-tag="esame">#esame</a>');
+    expect(renderMarkdown("Vedi [[Cellula]] #esame")).not.toContain("wikilink");
+    const probe = document.createElement("div");
+    probe.innerHTML = renderMarkdown('[[<img src=x onerror="alert(1)">]] #<script>x</script>', 0, { notes: true });
+    expect(probe.querySelectorAll("img, script, [onerror]")).toHaveLength(0);
   });
 });
 

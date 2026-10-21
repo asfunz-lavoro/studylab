@@ -266,3 +266,24 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .help-section[open] summary { margin-bottom: 12px; }
 
 .pagetext { white-space: pre-wrap; line-height: 1.65; font-size: 0.98rem; }
+
+/* ---------------------------------------------------------------- linked notes */
+.md .wikilink { color: var(--accent); font-weight: 600; text-decoration: none; cursor: pointer; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+.md .wikilink:hover { border-bottom-color: var(--accent); }
+.md .wikilink.unresolved { color: var(--text-2); border-bottom-style: dashed; opacity: 0.85; }
+.md .tag { display: inline-block; padding: 0 8px; border-radius: 999px; background: var(--accent-2); color: var(--accent); font-size: 0.85em; font-weight: 600; text-decoration: none; cursor: pointer; }
+.chip.small { padding: 3px 10px; font-size: 0.8rem; }
+.suggest { position: absolute; left: 8px; right: 8px; top: 100%; margin-top: 4px; z-index: 10; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow); display: flex; flex-direction: column; max-height: 260px; overflow-y: auto; }
+.suggest:empty { display: none; }
+.suggest button { border: 0; background: none; text-align: left; padding: 9px 12px; cursor: pointer; }
+.suggest button.active, .suggest button:hover { background: var(--accent-2); }
+.graph { width: 100%; display: block; background: var(--surface-2); border-radius: var(--radius-sm); touch-action: none; cursor: grab; user-select: none; }
+.graph:active { cursor: grabbing; }
+.graph .edge { stroke: var(--border); stroke-width: 1.4; }
+.graph .edge.on { stroke: var(--accent); stroke-width: 2.2; }
+.graph .edge.dim { opacity: 0.25; }
+.graph .node { cursor: pointer; transition: opacity 0.15s; }
+.graph .node circle { stroke: var(--surface); stroke-width: 2; }
+.graph .node.current circle { stroke: var(--text); stroke-width: 3; }
+.graph .node text { font-size: 11px; fill: var(--text); paint-order: stroke; stroke: var(--surface-2); stroke-width: 3px; pointer-events: none; }
+.graph .node.dim { opacity: 0.25; }

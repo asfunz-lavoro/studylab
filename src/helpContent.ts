@@ -82,6 +82,20 @@ L'app calcola da sola quando mostrarti ogni carta (algoritmo FSRS). Tu devi solo
 **Quiz:** genera domande a scelta multipla su un capitolo. Alla fine puoi trasformare gli errori in flashcard con un clic.`,
   },
   {
+    id: "links",
+    title: "Appunti collegati (come in Obsidian)",
+    body: `Negli **Appunti** puoi costruire una rete di concetti collegati, proprio come in Obsidian, senza installare nulla.
+
+- **Collegare due appunti:** scrivi \`[[\` e scegli il titolo dal menu che compare (oppure scrivi tu il titolo e chiudi con \`]]\`). In anteprima il collegamento diventa cliccabile. Se l'appunto non esiste ancora, il collegamento è grigio: cliccandolo lo crei.
+- **Testo diverso dal titolo:** \`[[Fotosintesi|la fotosintesi]]\` mostra "la fotosintesi" ma apre l'appunto *Fotosintesi*.
+- **Collegamenti in entrata:** sotto ogni appunto vedi quali altri appunti lo citano.
+- **Tag:** scrivi ad esempio \`#esame\` o \`#da-ripassare\`. A sinistra puoi filtrare gli appunti per tag.
+- **Grafo:** il pulsante 🕸️ *Grafo* mostra tutti gli appunti come punti collegati da linee. Più un punto è grande, più è collegato. Clicca un punto per aprirlo.
+- **Rinominare:** se cambi il titolo di un appunto, i collegamenti negli altri appunti si aggiornano da soli.
+
+Con *Impostazioni → Esporta per Obsidian* puoi aprire tutto in Obsidian: i collegamenti funzionano anche lì.`,
+  },
+  {
     id: "scans",
     title: "PDF scansionati e foto degli appunti",
     body: `Alcuni PDF sono "fotografie" delle pagine: non contengono testo che il computer possa leggere. StudyLab te lo segnala con un avviso giallo.
@@ -205,6 +219,20 @@ After seeing the answer, be honest:
 The app works out when to show each card (FSRS algorithm). You just open **Review** every day and clear the day's cards.
 
 **Quiz:** generates multiple-choice questions on a chapter. At the end you can turn your mistakes into flashcards with one click.`,
+  },
+  {
+    id: "links",
+    title: "Linked notes (like Obsidian)",
+    body: `In **Notes** you can build a web of linked ideas, just like in Obsidian, without installing anything.
+
+- **Link two notes:** type \`[[\` and pick a title from the menu (or type the title yourself and close with \`]]\`). In preview the link becomes clickable. If the note doesn't exist yet the link is grey: clicking it creates the note.
+- **Different text than the title:** \`[[Photosynthesis|photosynthesis]]\` shows "photosynthesis" but opens the note *Photosynthesis*.
+- **Linked mentions:** below each note you see which other notes mention it.
+- **Tags:** write e.g. \`#exam\` or \`#to-review\`. On the left you can filter notes by tag.
+- **Graph:** the 🕸️ *Graph* button shows all notes as dots joined by lines. Bigger dots have more links. Click a dot to open it.
+- **Renaming:** if you change a note's title, links in other notes update automatically.
+
+With *Settings → Export for Obsidian* you can open everything in Obsidian: links work there too.`,
   },
   {
     id: "scans",

@@ -197,3 +197,64 @@ test("mobile layout uses bottom navigation", async ({ page }) => {
   const hasHorizontalScroll = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(hasHorizontalScroll).toBe(false);
 });
+
+async function quickOnboard(page: Page, subject: string) {
+  await page.goto("./");
+  for (let i = 0; i < 4; i++) await page.getByTestId("onb-next").click();
+  await page.getByPlaceholder(/Biologia, Storia/).fill(subject);
+  await page.getByTestId("onb-finish").click();
+  await expect(page.getByRole("heading", { name: "Materiale di studio" })).toBeVisible();
+}
+
+test("linked notes work like Obsidian: links, backlinks, autocomplete, rename, tags, graph", async ({ page }) => {
+  await quickOnboard(page, "Biologia");
+  await page.getByRole("button", { name: /Appunti/ }).first().click();
+
+  // A note linking to one that doesn't exist yet.
+  await page.getByRole("button", { name: /Nuovo appunto/ }).click();
+  await page.getByTestId("note-title").fill("Fotosintesi");
+  await page.getByTestId("note-body").fill("Avviene nei [[Cloroplasti]] delle piante. #esame");
+  await page.getByTestId("note-preview").click();
+  const pending = page.locator(".md .wikilink.unresolved", { hasText: "Cloroplasti" });
+  await expect(pending).toBeVisible();
+  await pending.click();
+  await expect(page.getByText('Creato l\'appunto "Cloroplasti".')).toBeVisible();
+  await expect(page.getByTestId("note-title")).toHaveValue("Cloroplasti");
+
+  // Backlink from Fotosintesi is listed under the new note.
+  await expect(page.getByTestId("backlinks")).toContainText("Collegamenti in entrata (1)");
+  await expect(page.getByTestId("backlinks")).toContainText("Fotosintesi");
+
+  // Autocomplete: typing [[Foto suggests the existing note.
+  await page.getByTestId("note-body").click();
+  await page.getByTestId("note-body").pressSequentially("Servono per la [[Foto");
+  await expect(page.locator(".suggest button.active")).toContainText("Fotosintesi");
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("note-body")).toHaveValue("Servono per la [[Fotosintesi]]");
+
+  // Rename Cloroplasti → Cloroplasto: the link inside Fotosintesi follows.
+  await page.getByTestId("note-title").fill("Cloroplasto");
+  await page.getByTestId("note-body").click();
+  await expect(page.getByText("Aggiornati i collegamenti in 1 appunto.")).toBeVisible();
+  await page.getByTestId("backlinks").getByRole("button", { name: /Fotosintesi/ }).click();
+  await expect(page.getByTestId("note-title")).toHaveValue("Fotosintesi");
+  await page.getByTestId("note-preview").click();
+  await expect(page.locator(".md .wikilink:not(.unresolved)", { hasText: "Cloroplasto" })).toBeVisible();
+  await expect(page.getByTestId("backlinks")).toContainText("Cloroplasto");
+
+  // Tag filter.
+  await page.getByRole("button", { name: /#esame/ }).first().click();
+  await expect(page.locator(".chat-item")).toHaveCount(1);
+  await page.getByRole("button", { name: /Mostra tutti gli appunti/ }).click();
+  await expect(page.locator(".chat-item")).toHaveCount(2);
+
+  // Graph: two nodes and one-or-two edges; clicking a node opens it.
+  await page.getByTestId("toggle-graph").click();
+  await expect(page.locator(".graph .node")).toHaveCount(2);
+  await expect(page.locator(".graph .edge").first()).toBeVisible();
+  await page.waitForTimeout(1500);
+  await shot(page, "12-graph");
+  await page.locator(".graph .node", { hasText: "Cloroplasto" }).locator("circle").click();
+  await expect(page.getByTestId("note-title")).toHaveValue("Cloroplasto");
+  await shot(page, "13-note-backlinks");
+});
