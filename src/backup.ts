@@ -45,7 +45,7 @@ export async function exportObsidianZip(): Promise<Blob> {
       `# ${d.title}`,
       "",
       p.tldr ? `> [!abstract] TL;DR\n> ${p.tldr}\n` : "",
-      p.url ? `- Semantic Scholar: ${p.url}` : "",
+      p.url ? `- Link: ${p.url}` : "",
       p.openAccessPdf ? `- PDF: ${p.openAccessPdf}` : "",
       p.doi ? `- DOI: https://doi.org/${p.doi}` : "",
     ].filter(Boolean);

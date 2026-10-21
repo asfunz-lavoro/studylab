@@ -18,13 +18,11 @@ export function Onboarding() {
     if (subject.trim()) {
       await db.subjects.add({ name: subject.trim(), color: SUBJECT_COLORS[0], createdAt: Date.now() });
     }
-    await updateSettings({ onboarded: true });
-    try {
-      await navigator.storage?.persist?.();
-    } catch {
-      /* not supported */
-    }
     go(subject.trim() ? "library" : "home");
+    await updateSettings({ onboarded: true });
+    // Ask the browser not to evict our data. Chrome answers silently; Firefox shows a permission
+    // prompt and the promise waits for the user, so never await it before navigating.
+    void navigator.storage?.persist?.().catch(() => undefined);
   };
 
   return (

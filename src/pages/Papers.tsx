@@ -25,7 +25,7 @@ export function Papers() {
       setResults(await searchPapers(query.trim(), { apiKey: settings.s2Key, year: year.trim() || undefined, limit: 15, onRetry: (n) => setStatus(t("papers.busy", { n })) }));
     } catch (err) {
       setResults(null);
-      setStatus(err instanceof S2Error && err.kind === "rateLimit" ? t("papers.busyFail") : errorText(err));
+      setStatus(err instanceof S2Error ? (err.kind === "rateLimit" ? t("papers.busyFail") : err.kind === "network" ? t("papers.networkFail") : errorText(err)) : errorText(err));
     }
     setBusy(false);
   };
@@ -113,9 +113,12 @@ export function Papers() {
               )}
               {meta.url && (
                 <a className="btn sm ghost" href={meta.url} target="_blank" rel="noreferrer">
-                  Semantic Scholar ↗
+                  {meta.doi ? "DOI" : meta.source === "openalex" ? "OpenAlex" : "Semantic Scholar"} ↗
                 </a>
               )}
+              <span className="muted small" style={{ marginLeft: "auto" }}>
+                {t("papers.via", { source: meta.source === "openalex" ? "OpenAlex" : "Semantic Scholar" })}
+              </span>
             </div>
           </div>
         );

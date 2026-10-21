@@ -15,7 +15,7 @@ Nothing to install: open the link in Chrome, Edge or Firefox. On first launch a 
 - **Tutor** – ask questions; answers are grounded in the uploaded materials and cite the exact pages `[1]`. Modes: *Explain*, *Quiz me*, *Keep it simple*. High-school or university level.
 - **Review** – AI-generated flashcards (editable before saving) with FSRS spaced repetition, multiple-choice quizzes (mistakes become flashcards), summaries/outlines.
 - **Notes** – Markdown notes with LaTeX math; tutor answers and summaries can be saved here.
-- **Papers** – search 200M+ scientific papers via Semantic Scholar, save them, get a plain-language explanation.
+- **Papers** – search 250M+ scientific papers via OpenAlex (no key needed) and Semantic Scholar (TL;DRs with a free key), save them, get a plain-language explanation.
 - **Backup / Obsidian export** – one zip with everything; an Obsidian-ready vault (notes, papers, `Q :: A` flashcards).
 
 ## AI providers
@@ -39,7 +39,7 @@ Most hosted providers (Gemini, OpenAI, Claude) require users to be **18+**. Olla
 ## Privacy model
 
 - Everything (files, extracted text, notes, flashcards, chats, keys) lives in the browser's IndexedDB on that device. There is no StudyLab server.
-- Requests go only to the chosen AI provider (question + retrieved excerpts) and to Semantic Scholar (paper search).
+- Requests go only to the chosen AI provider (question + retrieved excerpts) and to OpenAlex / Semantic Scholar (paper search).
 - The production build ships a Content-Security-Policy that only allows the app's own scripts.
 - Backups never include API keys.
 
@@ -51,7 +51,7 @@ npm run dev          # http://localhost:5173
 npm test             # unit tests (Vitest)
 npm run build        # production build in dist/
 npx playwright test  # end-to-end test in the installed Chrome (AI is mocked)
-NETWORK=1 npx playwright test   # also hits the real Semantic Scholar API
+NETWORK=1 npx playwright test   # also hits the real paper-search APIs
 ```
 
 Pushing to `main` runs type-check, unit tests and build, then publishes `dist/` to GitHub Pages (`.github/workflows/deploy.yml`).

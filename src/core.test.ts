@@ -10,6 +10,7 @@ import JSZip from "jszip";
 import { exportObsidianZip } from "./backup";
 import { translator } from "./i18n";
 import { pagesForPrompt } from "./prompts";
+import { abstractFromInvertedIndex, fromOpenAlex, openAlexYearFilter, searchPapers } from "./s2";
 import { chunkPage, cleanText, textToPages } from "./rag/chunk";
 import { saveDocument } from "./rag/ingest";
 import { normalizeTerm, resetSearchCache, searchChunks } from "./rag/search";
@@ -240,6 +241,54 @@ describe("review fixes", () => {
     const zip = await JSZip.loadAsync(await exportObsidianZip());
     const names = Object.keys(zip.files).filter((n) => !zip.files[n].dir).sort();
     expect(names).toEqual(["Bio/Flashcards (2).md", "Bio/Flashcards.md", "Bio/Untitled (2).md", "Bio/Untitled.md"]);
+  });
+});
+
+describe("paper search", () => {
+  it("maps OpenAlex works and rebuilds abstracts", () => {
+    expect(abstractFromInvertedIndex({ La: [0], cellula: [1, 3], una: [2] })).toBe("La cellula una cellula");
+    const p = fromOpenAlex({
+      id: "https://openalex.org/W1",
+      display_name: "PINNs",
+      publication_year: 2019,
+      authorships: [{ author: { display_name: "M. Raissi" } }],
+      cited_by_count: 9000,
+      doi: "https://doi.org/10.1016/j.jcp.2018.10.045",
+      primary_location: { source: { display_name: "J. Comput. Phys." } },
+      best_oa_location: { pdf_url: "https://x/pdf" },
+    });
+    expect(p).toMatchObject({ paperId: "openalex:W1", year: 2019, venue: "J. Comput. Phys.", citationCount: 9000, source: "openalex" });
+    expect(p.externalIds?.DOI).toBe("10.1016/j.jcp.2018.10.045");
+    expect(p.openAccessPdf?.url).toBe("https://x/pdf");
+  });
+
+  it("converts year filters", () => {
+    expect(openAlexYearFilter("2020-")).toBe("publication_year:>2019");
+    expect(openAlexYearFilter("2018-2021")).toBe("publication_year:2018-2021");
+    expect(openAlexYearFilter("-2010")).toBe("publication_year:<2011");
+    expect(openAlexYearFilter("2022")).toBe("publication_year:2022");
+    expect(openAlexYearFilter("abc")).toBeNull();
+  });
+
+  it("without a key uses OpenAlex; with a key falls back to OpenAlex when the browser blocks Semantic Scholar", async () => {
+    const urls: string[] = [];
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      urls.push(url);
+      // A 429 without CORS headers reaches the page as a TypeError, exactly like this.
+      if (url.includes("semanticscholar")) throw new TypeError("NetworkError when attempting to fetch resource.");
+      return new Response(JSON.stringify({ results: [{ id: "https://openalex.org/W9", display_name: "Fotosintesi" }] }));
+    });
+    expect((await searchPapers("fotosintesi"))[0].title).toBe("Fotosintesi");
+    expect(urls[0]).toContain("api.openalex.org");
+
+    vi.useFakeTimers();
+    urls.length = 0;
+    const p = searchPapers("fotosintesi", { apiKey: "k" });
+    await vi.runAllTimersAsync();
+    expect((await p)[0].source).toBe("openalex");
+    expect(urls.filter((u) => u.includes("semanticscholar"))).toHaveLength(4);
+    vi.useRealTimers();
   });
 });
 

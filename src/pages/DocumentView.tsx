@@ -59,7 +59,7 @@ export function DocumentView({ docId, initialPage }: { docId: number; initialPag
                 <>
                   {" · "}
                   <a href={doc.paper.url} target="_blank" rel="noreferrer">
-                    Semantic Scholar ↗
+                    {doc.paper.doi ? "DOI" : doc.paper.source === "openalex" ? "OpenAlex" : "Semantic Scholar"} ↗
                   </a>
                 </>
               )}

@@ -40,6 +40,7 @@ export interface PaperMeta {
   openAccessPdf?: string;
   citationCount?: number;
   tldr?: string;
+  source?: "s2" | "openalex";
 }
 
 export interface Doc {

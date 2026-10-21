@@ -96,7 +96,7 @@ Puoi anche caricare **foto** degli appunti scritti a mano (JPG, PNG): vengono tr
     id: "privacy",
     title: "Privacy e costi",
     body: `- **Dove sono i miei dati?** Solo in questo browser, su questo computer. StudyLab non ha un server che li riceve.
-- **Cosa viene inviato fuori?** Quando usi il tutor, le flashcard, i quiz o la trascrizione, il testo necessario (la domanda e i brani dei materiali) viene inviato **al servizio AI che hai scelto**, con la tua chiave. La ricerca di articoli contatta Semantic Scholar.
+- **Cosa viene inviato fuori?** Quando usi il tutor, le flashcard, i quiz o la trascrizione, il testo necessario (la domanda e i brani dei materiali) viene inviato **al servizio AI che hai scelto**, con la tua chiave. La ricerca di articoli contatta OpenAlex e/o Semantic Scholar.
 - **La chiave è al sicuro?** È salvata in questo browser. Non condividerla con nessuno e non usare StudyLab su computer pubblici.
 - **Quanto costa?** StudyLab è gratis. Google Gemini, Groq, OpenRouter (modelli :free) e Mistral hanno piani gratuiti con dei limiti; OpenAI, Claude e DeepSeek sono a pagamento in base all'uso. Ollama è gratis ma usa il tuo computer.
 - **Età:** molti servizi AI (tra cui Gemini, OpenAI e Claude) richiedono almeno 18 anni. Se hai meno di 18 anni usa Ollama, che funziona sul tuo computer.`,
@@ -221,7 +221,7 @@ You can also upload **photos** of handwritten notes (JPG, PNG): they're transcri
     id: "privacy",
     title: "Privacy and costs",
     body: `- **Where is my data?** Only in this browser, on this computer. StudyLab has no server that receives it.
-- **What gets sent out?** When you use the tutor, flashcards, quizzes or transcription, the necessary text (your question and excerpts from your materials) is sent **to the AI service you chose**, with your key. Paper search contacts Semantic Scholar.
+- **What gets sent out?** When you use the tutor, flashcards, quizzes or transcription, the necessary text (your question and excerpts from your materials) is sent **to the AI service you chose**, with your key. Paper search contacts OpenAlex and/or Semantic Scholar.
 - **Is my key safe?** It's stored in this browser. Don't share it with anyone and don't use StudyLab on public computers.
 - **How much does it cost?** StudyLab is free. Google Gemini, Groq, OpenRouter (:free models) and Mistral have free tiers with limits; OpenAI, Claude and DeepSeek charge by usage. Ollama is free but uses your computer.
 - **Age:** many AI services (including Gemini, OpenAI and Claude) require you to be at least 18. If you're under 18, use Ollama, which runs on your own computer.`,

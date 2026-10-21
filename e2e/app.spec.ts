@@ -168,7 +168,7 @@ test("a new student can set up, upload a book, ask the tutor and study", async (
   expect(consoleErrors.filter((e) => /Content Security Policy|Refused to/i.test(e))).toEqual([]);
 });
 
-test("paper search works against the real Semantic Scholar API @network", async ({ page }) => {
+test("paper search returns real results without any key @network", async ({ page }) => {
   test.skip(!process.env.NETWORK, "set NETWORK=1 to run");
   await page.goto("./");
   await page.evaluate(async () => {
@@ -182,13 +182,11 @@ test("paper search works against the real Semantic Scholar API @network", async 
   await page.getByRole("button", { name: /Articoli/ }).first().click();
   await page.getByPlaceholder(/Cerca un argomento/).fill("physics-informed neural networks");
   await page.getByRole("button", { name: /Cerca/ }).click();
-  const result = page.locator(".paper h3").first();
-  const busy = page.getByText(/troppo occupato/);
-  await expect(result.or(busy)).toBeVisible({ timeout: 60_000 });
-  if (await result.isVisible()) {
-    await page.locator(".paper").first().getByRole("button", { name: /Salva nella materia/ }).click();
-    await expect(page.getByText("Salvato in Materiale.")).toBeVisible();
-  }
+  // Without a Semantic Scholar key the search goes to OpenAlex, which must return real results.
+  await expect(page.locator(".paper h3").first()).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText("da OpenAlex").first()).toBeVisible();
+  await page.locator(".paper").first().getByRole("button", { name: /Salva nella materia/ }).click();
+  await expect(page.getByText("Salvato in Materiale.")).toBeVisible();
 });
 
 test("mobile layout uses bottom navigation", async ({ page }) => {
